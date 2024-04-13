@@ -7,7 +7,6 @@ const NO_ARGS = JSON.stringify({});
 
 @NearBindgen({})
 class CrossContractCall {
-  hello_account: AccountId = "near-jamon.testnet";
   gas_to_use: BigInt = FIVE_TGAS;
   mtc_contract: AccountId = "multichain-testnet-2.testnet";
 
