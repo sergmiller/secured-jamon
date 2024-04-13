@@ -1,74 +1,68 @@
-import { NearBindgen, initialize, call, near, NearPromise, PromiseIndex } from "near-sdk-js";
+import {NearBindgen, initialize, call, near, NearPromise, PromiseIndex, view} from "near-sdk-js";
 import { AccountId } from "near-sdk-js/lib/types";
 
-const FIVE_TGAS = BigInt("50000000000000");
+const FIVE_TGAS = BigInt("100000000000000");
 const NO_DEPOSIT = BigInt(0);
 const NO_ARGS = JSON.stringify({});
 
 @NearBindgen({})
 class CrossContractCall {
-  hello_account: AccountId = "hello-nearverse.testnet";
+  hello_account: AccountId = "near-jamon.testnet";
+  gas_to_use: BigInt = FIVE_TGAS;
+  mtc_contract: AccountId = "multichain-testnet-2.testnet";
 
   @initialize({})
-  init({ hello_account }: { hello_account: AccountId }) {
-    this.hello_account = hello_account
+  init({ mtc_contract }: { mtc_contract: AccountId }) {
+    this.mtc_contract = mtc_contract
   }
 
-  @call({})
-  query_greeting(): NearPromise {
-    const promise = NearPromise.new(this.hello_account)
-    .functionCall("get_greeting", NO_ARGS, NO_DEPOSIT, FIVE_TGAS)
+  @view({})
+  get_mtc_contract(): AccountId {
+    return this.mtc_contract;
+  }
+
+  @call({}) // Set gas for cross contract call.
+  set_gas({ gas_to_use }: { gas_to_use: BigInt }): void {
+    near.log(`Saving gas_to_use ${gas_to_use}`);
+    this.gas_to_use = gas_to_use;
+  }
+
+  // CHANGE
+  @call({})  // payload from
+  sign_via_mpc({ payload, path }: { payload: string, path: string}): NearPromise {
+    const promise = NearPromise.new(this.mtc_contract)
+        // call { contractId, method: 'sign', args: { payload, path, key_version: 0 }, gas: '250000000000000' })
+        // @ts-ignore
+    .functionCall("sign", JSON.stringify({ payload, path, key_version: 0 }), NO_DEPOSIT, this.gas_to_use)
     .then(
       NearPromise.new(near.currentAccountId())
-      .functionCall("query_greeting_callback", NO_ARGS, NO_DEPOSIT, FIVE_TGAS)
+          // @ts-ignore
+      .functionCall("sign_via_mpc_callback", NO_ARGS, NO_DEPOSIT, this.gas_to_use)
     )
-    
+
     return promise.asReturn();
   }
 
   @call({privateFunction: true})
-  query_greeting_callback(): String {
+  sign_via_mpc_callback(): String {
     let {result, success} = promiseResult()
 
     if (success) {
+      near.log(`Success!`)
+      // In order to recover the result you need to decode it from the resulting buffer.
       return result.substring(1, result.length-1);
     } else {
-      near.log("Promise failed...")
+      near.log("Promise for sign_via_mpc failed...")
       return ""
-    }
-  }
-
-  @call({})
-  change_greeting({ new_greeting }: { new_greeting: string }): NearPromise {
-    const promise = NearPromise.new(this.hello_account)
-    .functionCall("set_greeting", JSON.stringify({ greeting: new_greeting }), NO_DEPOSIT, FIVE_TGAS)
-    .then(
-      NearPromise.new(near.currentAccountId())
-      .functionCall("change_greeting_callback", NO_ARGS, NO_DEPOSIT, FIVE_TGAS)
-    )
-
-    return promise.asReturn();
-  }
-
-  @call({privateFunction: true})
-  change_greeting_callback(): boolean {
-    let { success } = promiseResult()
-
-    if (success) {
-      near.log(`Success!`)
-      return true
-    } else {
-      near.log("Promise failed...")
-      return false
     }
   }
 }
 
 function promiseResult(): {result: string, success: boolean}{
   let result, success;
-  
+
   try{ result = near.promiseResult(0 as PromiseIndex); success = true }
   catch{ result = undefined; success = false }
-  
+
   return {result, success}
 }
