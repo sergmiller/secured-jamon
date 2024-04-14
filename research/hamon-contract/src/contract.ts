@@ -43,14 +43,13 @@ class Contract {
 
     @call({payableFunction:true})
     accept_offer({withdraw_address}: {withdraw_address: string}): void {
-      near.log(`Accepting offer ${this.offer_author}, ${this.offer_value}`);
-      this.offer_author = "";
-      this.offer_value = BigInt("0");
-      near.log(`Transfering to ${this.offer_author}, ${this.offer_value}`)
-      NearPromise.new(this.offer_author).transfer(this.offer_value);
-      near.log("Allow call to transfer from derived account")
-      this.can_withdraw = true;
-      this.withdraw_address = withdraw_address;
+        assert(this.offer_author != "", "Offer is not initialized");
+        near.log(`Accepting offer & transfer to ${this.offer_author}, ${this.offer_value}`);
+        NearPromise.new(this.offer_author).transfer(this.offer_value);
+        this.offer_author = "";
+        near.log("Allow call to transfer from derived account")
+        this.can_withdraw = true;
+        this.withdraw_address = withdraw_address;
     }
 
     @call({})
@@ -58,7 +57,7 @@ class Contract {
         assert(this.can_withdraw, "Can not withdraw");
         near.log(`Withdrawing ${this.offer_value}`);
         const payload = {
-            amount: this.offer_value,
+            amount: this.offer_value.toString(),
             to: this.withdraw_address
         }
         return this.sign_via_mpc({ payload: JSON.stringify(payload), path: this.derived_path });
