@@ -38,6 +38,6 @@ SecuredJamon protocol exchange consists on following stages:
 
 4) buyer put his USDC to market contract to accept offer. In this single transaction NEAR USDC goes to seller and market contract unlock possibility to sign withdraw from Derived market address in Etherium
 
-5) seller (and only him) may call market contract any time to create signature to withdraw money from Derived market address at ETH via NEAR MPC.
+5) buyer (and only him) may call market contract any time to create signature to withdraw money from Derived market address at ETH via NEAR MPC.
 
 
