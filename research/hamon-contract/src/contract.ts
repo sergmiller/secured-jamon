@@ -14,6 +14,8 @@ import {
 
 const MIN_STORAGE: bigint = BigInt("1100000000000000000000000"); // 1.1Ⓝ
 const FIVE_TGAS = BigInt("100000000000000");
+const NO_DEPOSIT = BigInt("0");
+const NO_ARGS = JSON.stringify({});
 
 // @NearBindgen({requireInit: true})
 @NearBindgen({})
@@ -34,11 +36,11 @@ class Contract {
 
     @call({})
     set_offer({ offer_value }: { offer_value: bigint }): void {
-        near.log(`Saving offer ${near.currentAccountId()} with ${this.offer_value}`);
         this.offer_author = near.currentAccountId();
         this.offer_value = offer_value;
         this.derived_path = "derived";
         this.can_withdraw = false;
+        near.log(`Saving offer ${near.currentAccountId()} with ${this.offer_value}`);
     }
 
     @call({payableFunction:true})
