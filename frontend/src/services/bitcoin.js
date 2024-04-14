@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as ethers from 'ethers';
 import * as bitcoin from "bitcoinjs-lib";
-import { deriveChildPublicKey, najPublicKeyStrToUncompressedHexPoint, uncompressedHexPointToBtcAddress } from '../services/kdf';
+import { deriveChildPublicKey, najPublicKeyStrToUncompressedHexPoint, uncompressedHexPointToBtcAddress } from './kdf.js';
 
 const TGAS = 1000000000000;
 

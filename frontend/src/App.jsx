@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import Navbar from "./components/Navbar"
-import { Wallet } from "./services/near-wallet";
-import { EthereumView } from "./components/Ethereum";
-import { BitcoinView } from "./components/Bitcoin";
+import Navbar from "./components/Navbar.jsx"
+import { Wallet } from "./services/near-wallet.js";
+import { EthereumView } from "./components/Ethereum.jsx";
+import { BitcoinView } from "./components/Bitcoin.jsx";
 
 // CONSTANTS
 const MPC_CONTRACT = 'multichain-testnet-2.testnet';

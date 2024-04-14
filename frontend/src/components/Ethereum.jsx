@@ -1,6 +1,6 @@
-import { Ethereum } from "../services/ethereum";
+import { Ethereum } from "../services/ethereum.js";
 import { useEffect, useState } from "react";
-import { useDebounce } from "../hooks/debounce";
+import { useDebounce } from "../hooks/debounce.jsx";
 import PropTypes from 'prop-types';
 
 const Sepolia = 11155111;
