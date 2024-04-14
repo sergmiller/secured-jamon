@@ -56,7 +56,6 @@ export function BitcoinView({ props: { setStatus, wallet, MPC_CONTRACT, MARKET_C
   async function chainSignature() {
     setStatus('🏗️ Creating transaction');
     const { transaction, payload } = await Eth.createPayload(senderAddress, receiver, amount);
-    console.log("TODODODOODO debug transaction: ", JSON.stringify(transaction))
 
     setStatus(`🕒 Asking ${MPC_CONTRACT} to sign the transaction, this might take a while`);
     try {
@@ -167,7 +166,8 @@ export function BitcoinView({ props: { setStatus, wallet, MPC_CONTRACT, MARKET_C
         <div className="row mb-3">Accept Deal on Jamon Market Contract</div>
         <div className="text-center">
           <div className="text-center">To accept the Deal you ought to transfer required amount of USDC within the
-            transaction. Note, accept the Deal only if you sure that TODO: derived market address deposited with ${amount}. of DAI.
+            transaction. Note, accept the Deal only if you sure that TODO: derived market address deposited with
+            ${amount}. of DAI.
           </div>
           {
               acceptDeal != "" &&
@@ -194,13 +194,15 @@ export function BitcoinView({ props: { setStatus, wallet, MPC_CONTRACT, MARKET_C
 
         <br/>
 
+        <div className="row mb-3">Fetch Signed Eth Transaction from Jamon Market</div>
         <div className="row mb-3">
-          <label className="col-sm-2 col-form-label col-form-label-sm">transactionHash from contract:</label>
+          <label className="col-sm-2 col-form-label col-form-label-sm">transaction hash:</label>
           <div className="col-sm-10">
             <input type="text" className="form-control form-control-sm" value={transactionHashHack}
                    onChange={handleTransactionHashHack} disabled={loading}/>
-            <div className="form-text" id="eth-sender"> {senderAddress} </div>
           </div>
+        </div>
+        <div className="text-center">
           <button className="btn btn-primary text-center" onClick={getSignatureForEth}
                   disabled={loading}> getSignatureForEth
           </button>
