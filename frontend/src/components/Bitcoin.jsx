@@ -1,6 +1,6 @@
-import { Bitcoin as Bitcoin } from "../services/bitcoin";
+import { Bitcoin as Bitcoin } from "../services/bitcoin.js";
 import { useState, useEffect } from "react";
-import { useDebounce } from "../hooks/debounce";
+import { useDebounce } from "../hooks/debounce.jsx";
 import PropTypes from 'prop-types';
 
 const BTC_NETWORK = 'testnet';
