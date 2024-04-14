@@ -1,6 +1,7 @@
 # secured-jamon
 project for ETHdam: atomic cross chain asset transfer manageable from NEAR
 
+https://taikai.network/cryptocanal/hackathons/ethdam2024/projects/cluwteuny00i4z3014wzzu4pi/idea
 
 ## Structure
 
