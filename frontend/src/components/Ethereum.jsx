@@ -192,21 +192,7 @@ export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT, MARKET_
           </button>
         </div>
 
-
-        <br/><br/><br/>
-
-        <div className="row mb-3">
-          <label className="col-sm-2 col-form-label col-form-label-sm">transactionHash from contract:</label>
-          <div className="col-sm-10">
-            <input type="text" className="form-control form-control-sm" value={transactionHashHack}
-                   onChange={handleTransactionHashHack} disabled={loading}/>
-            <div className="form-text" id="eth-sender"> {senderAddress} </div>
-          </div>
-          <button className="btn btn-primary text-center" onClick={getSignatureForEth}
-                  disabled={loading}> getSignatureForEth
-          </button>
-        </div>
-
+        TODO: withdraw USDC from Market
       </>
   )
 }
