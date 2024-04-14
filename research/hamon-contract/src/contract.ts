@@ -18,7 +18,7 @@ const NO_DEPOSIT = BigInt("0");
 const NO_ARGS = JSON.stringify({});
 
 // @NearBindgen({requireInit: true})
-@NearBindgen({})
+@NearBindgen({requireInit: true})
 class Contract {
     offer_author = "";
     offer_value = BigInt("0");
@@ -29,9 +29,14 @@ class Contract {
     gas_to_use: BigInt = FIVE_TGAS;
     mtc_contract: AccountId = "multichain-testnet-2.testnet";
 
-    @initialize({})
-    init({ mtc_contract }: { mtc_contract: AccountId }) {
-      this.mtc_contract = mtc_contract
+    @view({})
+    get_gas_to_use(): BigInt {
+        return this.gas_to_use;
+    }
+
+    @view({})
+    get_mtc_contract(): AccountId {
+        return this.mtc_contract;
     }
 
     @call({})
@@ -55,7 +60,7 @@ class Contract {
     }
 
     @call({})
-    makeWithdrawSignature(): NearPromise {
+    withdraw(): NearPromise {
         assert(this.can_withdraw, "Can not withdraw");
         near.log(`Withdrawing ${this.offer_value}`);
         const payload = {
