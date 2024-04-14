@@ -5,8 +5,10 @@ import PropTypes from 'prop-types';
 
 const Sepolia = 11155111;
 const Eth = new Ethereum('https://rpc2.sepolia.org', Sepolia);
+const DEFAULT_GAS = '250000000000000'
 
-export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT } }) {
+// Seller
+export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT, MARKET_CONTRACT } }) {
 
   const [receiver, setReceiver] = useState("0xe0f3B7e68151E9306727104973752A415c2bcbEb");
   const [amount, setAmount] = useState(0.01);
@@ -17,6 +19,9 @@ export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT } }) {
   const [transactionHashHack, setTransactionHashHack] = useState("")
   const [payloadPrepared, setPayloadPrepared] = useState("")
   const [transactionRaw, setTransactionRaw] = useState("")
+  // TODO: new code.
+  const [createdDeal, setCreatedDeal] = useState("")
+  const [sellerDepositToEthResult, setSellerDepositToEthResult] = useState("")
 
   const [derivation, setDerivation] = useState("cross-contract-jamon5.testnet");
   const derivationPath = useDebounce(derivation, 1000);
@@ -105,10 +110,24 @@ export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT } }) {
     setLoading(false);
   }
 
+  const handleCreateDeal = async () => {
+    setLoading(true);
+    setStatus(`call ${MARKET_CONTRACT}...`)
+    try{
+      const request = await wallet.callMethod(
+        { contractId: MARKET_CONTRACT, method: 'set_offer', args: { amount: amount }, gas: DEFAULT_GAS });
+      setStatus(`✅ Successful: https://sepolia.etherscan.io/tx/${request.transaction.hash}`);
+      setCreatedDeal(`https://sepolia.etherscan.io/tx/${request.transaction.hash}`)
+    } catch (e) {
+      setStatus(`❌ Error: ${e.message}`);
+    }
+    setLoading(false);
+  }
+
   return (
       <>
         <div className="row mb-3">
-          <label className="col-sm-2 col-form-label col-form-label-sm">From:</label>
+          <label className="col-sm-2 col-form-label col-form-label-sm">From (Seller Near):</label>
           <div className="col-sm-10">
             <input type="text" className="form-control form-control-sm" value={derivation}
                    onChange={handleDerivationChange} disabled={loading}/>
@@ -116,7 +135,7 @@ export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT } }) {
           </div>
         </div>
         <div className="row mb-3">
-          <label className="col-sm-2 col-form-label col-form-label-sm">To:</label>
+          <label className="col-sm-2 col-form-label col-form-label-sm">To (Buyer):</label>
           <div className="col-sm-10">
             <input type="text" className="form-control form-control-sm" value={receiver}
                    onChange={(e) => setReceiver(e.target.value)} disabled={loading}/>
@@ -130,27 +149,54 @@ export function EthereumView({ props: { setStatus, wallet, MPC_CONTRACT } }) {
             <div className="form-text"> Ethereum units</div>
           </div>
         </div>
-
-        <div className="text-center">
-          {step === 'request' &&
-              <button className="btn btn-primary text-center" onClick={UIChainSignature} disabled={loading}> Request
-                Signature </button>}
-          {step === 'relay' &&
-              <button className="btn btn-success text-center" onClick={relayTransaction} disabled={loading}> Relay
-                Transaction </button>}
+        <div className="row mb-3">
+          <label className="col-sm-2 col-form-label col-form-label-sm">Eth Payload:</label>
+          <div className="col-sm-10">
+            <input type="text" className="form-control form-control-sm" value={payloadPrepared}
+                   onChange={(e) => setReceiver(e.target.value)} disabled={true}/>
+          </div>
         </div>
 
-        <br/><br/><br/>
         <div className="text-center">
-          <div className="text">payloadPrepared: {payloadPrepared}</div>
-          <div className="text">transactionRaw: {transactionRaw}</div>
-          <button className="btn btn-primary text-center" onClick={handleShowPayloadAndTransaction} disabled={loading}> Show payload
-            and transaction
+          <button className="btn btn-primary text-center" onClick={handleShowPayloadAndTransaction}
+                  disabled={loading}> Show payload
           </button>
         </div>
 
+        <br/>
+        <div className="row mb-3">Create Deal on Jamon Market Contract</div>
+        <div className="text-center">
+          {
+              createdDeal != "" &&
+              <input type="text" className="form-control form-control-sm" value={createdDeal} disabled={true}/>
+          }
+          {
+              createdDeal != "" &&
+              <div className="text-center">After Deal created you need to deposit to the ETH address that Market
+                Contract controls</div>
+          }
+          <button className="btn btn-primary text-center" onClick={handleCreateDeal}
+                  disabled={loading} > Create Deal
+          </button>
+        </div>
+
+        <br/>
+        <div className="row mb-3">Deposit DAI on Ethereum</div>
+        <div className="text-center">
+          <div className="text-center">
+            Now Buyer has time to check if DAI deposited to derived by Market contract address<br/>
+            Currently, it is not implemented in the App: deposit from metamask yourself please...
+          </div>
+          <button className="btn btn-primary text-center" onClick={null}
+                  disabled={true}> Deposit DAI
+          </button>
+        </div>
+
+
+        <br/><br/><br/>
+
         <div className="row mb-3">
-        <label className="col-sm-2 col-form-label col-form-label-sm">transactionHash from contract:</label>
+          <label className="col-sm-2 col-form-label col-form-label-sm">transactionHash from contract:</label>
           <div className="col-sm-10">
             <input type="text" className="form-control form-control-sm" value={transactionHashHack}
                    onChange={handleTransactionHashHack} disabled={loading}/>
@@ -170,5 +216,6 @@ EthereumView.propTypes = {
     setStatus: PropTypes.func.isRequired,
     wallet: PropTypes.object.isRequired,
     MPC_CONTRACT: PropTypes.string.isRequired,
+    MARKET_CONTRACT: PropTypes.string.isRequired,
   }).isRequired
 };
