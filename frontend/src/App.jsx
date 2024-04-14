@@ -14,8 +14,7 @@ const wallet = new Wallet({ network: 'testnet', createAccessKeyFor: MARKET_CONTR
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [status, setStatus] = useState("Please login to request a signature");
-  // TODO: change on eth.
-  const [chain, setChain] = useState('btc');
+  const [chain, setChain] = useState('eth');
 
   useEffect(() => {
     const initFunction = async () => {
