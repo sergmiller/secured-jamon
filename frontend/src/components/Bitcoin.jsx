@@ -111,7 +111,7 @@ export function BitcoinView({ props: { setStatus, wallet, MPC_CONTRACT, MARKET_C
 
   const handleAcceptDeal = async () => {
     setLoading(true);
-    setStatus(`Call ${MARKET_CONTRACT} with accept_offer and withdraw_address: ${withdraw_address}...`)
+    setStatus(`Call ${MARKET_CONTRACT} with accept_offer and withdraw_address: ${withdrawAddress}...`)
     try{
       const request = await wallet.callMethod(
         { contractId: MARKET_CONTRACT, method: 'accept_offer', args: { withdraw_address: withdrawAddress }, gas: DEFAULT_GAS });
