@@ -14,7 +14,10 @@ const MPC_PATH = import.meta.env.VITE_MPC_PATH ?? "";
 console.log(MPC_PUBLIC_KEY, MPC_PATH)
 
 export class JamonSwapClient {
-    constructor() {
+    // Kinda engine for Near chain transaction {custom wallet, near account}.
+    private account: any;
+    constructor(wallet) {
+        this.account = wallet;
     }
 
     // Generate Derived Address in the Ethereum Network
@@ -34,7 +37,15 @@ export class JamonSwapClient {
     // Deposit Near on Near chain, and receive Eth from derived account for his address on Ethereum chain.
     async acceptDeal({buyerEthAddress, amountEth}) {
         const derivedAddress = await this.getDerivedEthAddress();
-        await ethereum.send({ from: derivedAddress, to: buyerEthAddress, amount: amountEth, mpcPath: MPC_PATH });
+        await ethereum.send(
+            {
+                from: derivedAddress,
+                to: buyerEthAddress,
+                amount: amountEth,
+                mpcPath: MPC_PATH,
+                nearAccount: this.account,
+                nearContractId: NEAR_PROXY_ACCOUNT_ID,
+            });
     }
 
     // async createDeal() {

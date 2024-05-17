@@ -7,9 +7,11 @@ import { BitcoinView } from "./components/Bitcoin.jsx";
 // CONSTANTS
 const MPC_CONTRACT = 'multichain-testnet-2.testnet';
 const MARKET_CONTRACT = 'cross-contract-jamon8.testnet';
+// I.e. Market Contract.
+const NEAR_PROXY_ACCOUNT_ID = import.meta.env.VITE_NEAR_PROXY_ACCOUNT_ID ?? "";
 
 // NEAR WALLET
-const wallet = new Wallet({ network: 'testnet', createAccessKeyFor: MARKET_CONTRACT });
+const wallet = new Wallet({ network: 'testnet', createAccessKeyFor: NEAR_PROXY_ACCOUNT_ID });
 
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);

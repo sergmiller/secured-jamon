@@ -31,6 +31,8 @@ const ethereum = {
     to = '0x525521d79134822a342d330bd91DA67976569aF1',
     amount = '0.0001',
     mpcPath,
+    nearAccount,
+    nearContractId,
   }) => {
     if (!address) return console.log('must provide a sending address [derived account]');
     const {
@@ -88,7 +90,7 @@ const ethereum = {
     };
 
     // where the call to mpc happen to get signature...
-    await completeEthereumTx({ address, baseTx, mpcPath });
+    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId });
   },
 
   // deployContract: async ({ from: address, path = './contracts/nft.bin' }) => {
@@ -155,7 +157,9 @@ const ethereum = {
     method = 'mint',
     args = { address: '0x525521d79134822a342d330bd91da67976569af1' },
     ret = [],
-      mpcPath
+      mpcPath,
+      nearAccount,
+      nearContractId,
   }) => {
     const { getGasPrice, completeEthereumTx, chainId } = ethereum;
 
@@ -183,10 +187,10 @@ const ethereum = {
       chainId,
     };
 
-    await completeEthereumTx({ address, baseTx, mpcPath });
+    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId });
   },
 
-  completeEthereumTx: async ({ address, baseTx, mpcPath }) => {
+  completeEthereumTx: async ({ address, baseTx, mpcPath, nearAccount, nearContractId }) => {
     const { chainId, getBalance, explorer, currency } = ethereum;
 
     // create hash of unsigned TX to sign -> payload
@@ -197,7 +201,7 @@ const ethereum = {
     // get signature from MPC contract
     let sig;
     // if (NEAR_PROXY_CONTRACT === 'true') {
-    sig = await sign(unsignedTx, mpcPath);
+    sig = await sign(unsignedTx, mpcPath, nearAccount, nearContractId);
     // } else {
     //   sig = await sign(payload, mpcPath);
     //   // payload was reversed in sign(...) call for MPC contract, reverse it back to recover eth address

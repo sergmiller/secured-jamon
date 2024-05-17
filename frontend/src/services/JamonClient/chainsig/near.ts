@@ -1,33 +1,7 @@
 import * as nearAPI from 'near-api-js';
 import BN from 'bn.js';
-const { Near, Account, keyStores, KeyPair } = nearAPI;
 
-// TODO: init account in upper levels.
-const NEAR_ACCOUNT_ID = import.meta.env.VITE_NEAR_ACCOUNT_ID ?? "";
-const NEAR_PRIVATE_KEY = import.meta.env.VITE_NEAR_PRIVATE_KEY ?? "";
-const NEAR_PROXY_ACCOUNT_ID = import.meta.env.VITE_NEAR_PROXY_ACCOUNT_ID ?? "";
-
-const accountId = NEAR_ACCOUNT_ID;
-const contractId = NEAR_PROXY_ACCOUNT_ID;
-const privateKey = NEAR_PRIVATE_KEY;
-const keyStore = new keyStores.InMemoryKeyStore();
-keyStore.setKey('testnet', accountId, KeyPair.fromString(privateKey));
-
-console.log('Near Chain Signature (NCS) call details:');
-console.log('Near accountId', accountId);
-console.log('NCS contractId', contractId);
-
-const config = {
-  networkId: 'testnet',
-  keyStore: keyStore,
-  nodeUrl: 'https://rpc.testnet.near.org',
-  walletUrl: 'https://testnet.mynearwallet.com/',
-  helperUrl: 'https://helper.testnet.near.org',
-  explorerUrl: 'https://testnet.nearblocks.io',
-};
-export const near = new Near(config);
-export const account = new Account(near.connection, accountId);
-export async function sign(payload, path) {
+export async function sign(payload, path, nearAccount, contractId) {
   const args = {
     payload,
     path,
@@ -53,17 +27,35 @@ export async function sign(payload, path) {
   console.log('this may take approx. 30 seconds to complete');
 
   let res;
+  // Support account with private key for tests, and custom wallet account for frontend.
   try {
-    res = await account.functionCall({
-      contractId,
-      methodName: 'sign',
-      args,
-      gas: new BN('300000000000000'),
-      attachedDeposit,
-    });
+    console.log('nearAccount.callMethod', nearAccount.callMethod)
+    console.log('nearAccount.functionCall', nearAccount.functionCall)
+    if (nearAccount.functionCall != undefined) {
+      console.log('[sign] Sign from near account...')
+      res = await nearAccount.functionCall({
+        contractId,
+        methodName: 'sign',
+        args,
+        gas: new BN('300000000000000'),
+        // attachedDeposit,
+      });
+    } else {
+      console.log('[sign] Sign from custom wallet account...')
+      res = await nearAccount.callMethod({
+        contractId,
+        method: 'sign',
+        args,
+        gas: new BN('300000000000000'),
+        // deposit: attachedDeposit,
+      });
+    }
+
   } catch (e) {
     return console.log('error signing', JSON.stringify(e));
   }
+
+  console.log('Check status...')
 
   // parse result into signature values we need r, s but we don't need first 2 bytes of r (y-parity)
   if ('SuccessValue' in (res.status as any)) {
