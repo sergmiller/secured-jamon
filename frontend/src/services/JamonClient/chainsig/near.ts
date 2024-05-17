@@ -1,22 +1,15 @@
 import * as nearAPI from 'near-api-js';
 import BN from 'bn.js';
 const { Near, Account, keyStores, KeyPair } = nearAPI;
-const {
-  MPC_CONTRACT_ID,
-  NEAR_ACCOUNT_ID,
-  NEAR_PRIVATE_KEY,
-  NEAR_PROXY_ACCOUNT,
-  NEAR_PROXY_CONTRACT,
-  NEAR_PROXY_ACCOUNT_ID,
-  NEAR_PROXY_PRIVATE_KEY,
-} = process.env;
 
-const accountId =
-  NEAR_PROXY_ACCOUNT === 'true' ? NEAR_PROXY_ACCOUNT_ID : NEAR_ACCOUNT_ID;
-const contractId =
-  NEAR_PROXY_CONTRACT === 'true' ? NEAR_PROXY_ACCOUNT_ID : MPC_CONTRACT_ID;
-const privateKey =
-  NEAR_PROXY_ACCOUNT === 'true' ? NEAR_PROXY_PRIVATE_KEY : NEAR_PRIVATE_KEY;
+// TODO: init account in upper levels.
+const NEAR_ACCOUNT_ID = import.meta.env.VITE_NEAR_ACCOUNT_ID ?? "";
+const NEAR_PRIVATE_KEY = import.meta.env.VITE_NEAR_PRIVATE_KEY ?? "";
+const NEAR_PROXY_ACCOUNT_ID = import.meta.env.VITE_NEAR_PROXY_ACCOUNT_ID ?? "";
+
+const accountId = NEAR_ACCOUNT_ID;
+const contractId = NEAR_PROXY_ACCOUNT_ID;
+const privateKey = NEAR_PRIVATE_KEY;
 const keyStore = new keyStores.InMemoryKeyStore();
 keyStore.setKey('testnet', accountId, KeyPair.fromString(privateKey));
 
@@ -43,14 +36,14 @@ export async function sign(payload, path) {
   };
   let attachedDeposit = '0';
 
-  if (process.env.NEAR_PROXY_CONTRACT === 'true') {
-    delete args.payload;
-    args.rlp_payload = payload.substring(2);
-    attachedDeposit = nearAPI.utils.format.parseNearAmount('1');
-  } else {
-    // reverse payload required by MPC contract
-    payload.reverse();
-  }
+  // if (process.env.NEAR_PROXY_CONTRACT === 'true') {
+  delete args.payload;
+  args.rlp_payload = payload.substring(2);
+  attachedDeposit = nearAPI.utils.format.parseNearAmount('1');
+  // } else {
+  //   // reverse payload required by MPC contract
+  //   payload.reverse();
+  // }
 
   console.log(
     'sign payload',

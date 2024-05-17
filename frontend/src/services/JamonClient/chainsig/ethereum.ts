@@ -1,10 +1,9 @@
-import { readFileSync } from 'fs';
+// import { readFileSync } from 'fs';
 import { ethers } from 'ethers';
 import BN from 'bn.js';
 import { fetchJson } from './utils';
-import prompts from 'prompts';
+// import prompts from 'prompts';
 import { sign } from './near';
-const { MPC_PATH, NEAR_PROXY_CONTRACT } = process.env;
 
 const ethereum = {
   name: 'Sepolia',
@@ -31,6 +30,7 @@ const ethereum = {
     from: address,
     to = '0x525521d79134822a342d330bd91DA67976569aF1',
     amount = '0.0001',
+    mpcPath,
   }) => {
     if (!address) return console.log('must provide a sending address [derived account]');
     const {
@@ -88,49 +88,49 @@ const ethereum = {
     };
 
     // where the call to mpc happen to get signature...
-    await completeEthereumTx({ address, baseTx });
+    await completeEthereumTx({ address, baseTx, mpcPath });
   },
 
-  deployContract: async ({ from: address, path = './contracts/nft.bin' }) => {
-    const { explorer, getGasPrice, completeEthereumTx, chainId } = ethereum;
-
-    const bytes = readFileSync(path, 'utf8');
-
-    const provider = getSepoliaProvider();
-    const nonce = await provider.getTransactionCount(address);
-
-    const contractAddress = ethers.utils.getContractAddress({
-      from: address,
-      nonce,
-    });
-
-    console.log('deploying bytes', bytes.length, 'to address', contractAddress);
-
-    const cont = await prompts({
-      type: 'confirm',
-      name: 'value',
-      message: 'Confirm? (y or n)',
-      initial: true,
-    });
-    if (!cont.value) return;
-
-    const gasPrice = await getGasPrice();
-
-    const baseTx = {
-      nonce,
-      data: bytes,
-      value: 0,
-      gasLimit: 6000000, // 6m gas
-      gasPrice,
-      chainId,
-    };
-
-    await completeEthereumTx({ address, baseTx });
-
-    console.log('contract deployed successfully to address:');
-    console.log(contractAddress);
-    console.log('explorer link', `${explorer}/address/${contractAddress}`);
-  },
+  // deployContract: async ({ from: address, path = './contracts/nft.bin' }) => {
+  //   const { explorer, getGasPrice, completeEthereumTx, chainId } = ethereum;
+  //
+  //   const bytes = readFileSync(path, 'utf8');
+  //
+  //   const provider = getSepoliaProvider();
+  //   const nonce = await provider.getTransactionCount(address);
+  //
+  //   const contractAddress = ethers.utils.getContractAddress({
+  //     from: address,
+  //     nonce,
+  //   });
+  //
+  //   console.log('deploying bytes', bytes.length, 'to address', contractAddress);
+  //
+  //   const cont = await prompts({
+  //     type: 'confirm',
+  //     name: 'value',
+  //     message: 'Confirm? (y or n)',
+  //     initial: true,
+  //   });
+  //   if (!cont.value) return;
+  //
+  //   const gasPrice = await getGasPrice();
+  //
+  //   const baseTx = {
+  //     nonce,
+  //     data: bytes,
+  //     value: 0,
+  //     gasLimit: 6000000, // 6m gas
+  //     gasPrice,
+  //     chainId,
+  //   };
+  //
+  //   await completeEthereumTx({ address, baseTx });
+  //
+  //   console.log('contract deployed successfully to address:');
+  //   console.log(contractAddress);
+  //   console.log('explorer link', `${explorer}/address/${contractAddress}`);
+  // },
 
   view: async ({
     to = '0x09a1a4e1cfca73c2e4f6599a7e6b98708fda2664',
@@ -155,6 +155,7 @@ const ethereum = {
     method = 'mint',
     args = { address: '0x525521d79134822a342d330bd91da67976569af1' },
     ret = [],
+      mpcPath
   }) => {
     const { getGasPrice, completeEthereumTx, chainId } = ethereum;
 
@@ -162,13 +163,13 @@ const ethereum = {
     console.log('call contract', to);
     const { data } = encodeData({ method, args, ret });
 
-    const cont = await prompts({
-      type: 'confirm',
-      name: 'value',
-      message: 'Confirm? (y or n)',
-      initial: true,
-    });
-    if (!cont.value) return;
+    // const cont = await prompts({
+    //   type: 'confirm',
+    //   name: 'value',
+    //   message: 'Confirm? (y or n)',
+    //   initial: true,
+    // });
+    // if (!cont.value) return;
 
     const gasPrice = await getGasPrice();
     const nonce = await provider.getTransactionCount(address);
@@ -182,10 +183,10 @@ const ethereum = {
       chainId,
     };
 
-    await completeEthereumTx({ address, baseTx });
+    await completeEthereumTx({ address, baseTx, mpcPath });
   },
 
-  completeEthereumTx: async ({ address, baseTx }) => {
+  completeEthereumTx: async ({ address, baseTx, mpcPath }) => {
     const { chainId, getBalance, explorer, currency } = ethereum;
 
     // create hash of unsigned TX to sign -> payload
@@ -195,13 +196,13 @@ const ethereum = {
 
     // get signature from MPC contract
     let sig;
-    if (NEAR_PROXY_CONTRACT === 'true') {
-      sig = await sign(unsignedTx, MPC_PATH);
-    } else {
-      sig = await sign(payload, MPC_PATH);
-      // payload was reversed in sign(...) call for MPC contract, reverse it back to recover eth address
-      payload.reverse();
-    }
+    // if (NEAR_PROXY_CONTRACT === 'true') {
+    sig = await sign(unsignedTx, mpcPath);
+    // } else {
+    //   sig = await sign(payload, mpcPath);
+    //   // payload was reversed in sign(...) call for MPC contract, reverse it back to recover eth address
+    //   payload.reverse();
+    // }
     if (!sig) return;
 
     sig.r = '0x' + sig.r;

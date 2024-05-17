@@ -1,4 +1,4 @@
-import { program } from 'commander';
+// import { program } from 'commander';
 import { generateAddress } from './kdf';
 import { sign, account } from './near';
 import dogecoin from './dogecoin';
