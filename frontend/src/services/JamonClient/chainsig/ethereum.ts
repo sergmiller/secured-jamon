@@ -5,6 +5,8 @@ import { fetchJson } from './utils';
 // import prompts from 'prompts';
 import { sign } from './near';
 
+export class InsufficientFundsOnTargetChain extends Error {}
+
 const ethereum = {
   name: 'Sepolia',
   chainId: 11155111,
@@ -33,6 +35,7 @@ const ethereum = {
     mpcPath,
     nearAccount,
     nearContractId,
+      derivedAddress,
   }) => {
     if (!address) return console.log('must provide a sending address [derived account]');
     const {
@@ -67,7 +70,7 @@ const ethereum = {
         ),
       )
     ) {
-      return console.log('insufficient funds');
+      throw new InsufficientFundsOnTargetChain();
     }
 
     console.log('sending', amount, currency, 'from', address, 'to', to);
@@ -90,7 +93,7 @@ const ethereum = {
     };
 
     // where the call to mpc happen to get signature...
-    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId });
+    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress });
   },
 
   // deployContract: async ({ from: address, path = './contracts/nft.bin' }) => {
@@ -160,6 +163,7 @@ const ethereum = {
       mpcPath,
       nearAccount,
       nearContractId,
+      derivedAddress,
   }) => {
     const { getGasPrice, completeEthereumTx, chainId } = ethereum;
 
@@ -187,10 +191,10 @@ const ethereum = {
       chainId,
     };
 
-    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId });
+    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress });
   },
 
-  completeEthereumTx: async ({ address, baseTx, mpcPath, nearAccount, nearContractId }) => {
+  completeEthereumTx: async ({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress }) => {
     const { chainId, getBalance, explorer, currency } = ethereum;
 
     // create hash of unsigned TX to sign -> payload
@@ -201,7 +205,7 @@ const ethereum = {
     // get signature from MPC contract
     let sig;
     // if (NEAR_PROXY_CONTRACT === 'true') {
-    sig = await sign(unsignedTx, mpcPath, nearAccount, nearContractId);
+    sig = await sign(unsignedTx, mpcPath, nearAccount, nearContractId, derivedAddress);
     // } else {
     //   sig = await sign(payload, mpcPath);
     //   // payload was reversed in sign(...) call for MPC contract, reverse it back to recover eth address

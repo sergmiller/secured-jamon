@@ -35,15 +35,24 @@ test("#jamonSwapClient", async () => {
     const client = new JamonSwapClient(
         account,
     )
-    const address = await client.getDerivedEthAddress()
-    console.log('Got Derived address: ', address)
+    const derivedAddress = await client.getDerivedEthAddress()
+    console.log('Got Derived address: ', derivedAddress)
 
-    await client.acceptDeal(
+    await client.createOffer(
+        {
+            derivedAddress,
+            expectedAmount: 1,
+        }
+    )
+
+    // TODO: check that Eth for derived account exists.
+
+    await client.acceptOffer(
     {
-        buyerEthAddress: "0x460b414B401c5560a59784b7e71850890C28B213", amountEth: "0.0002"
+        derivedAddress,
+        buyerEthAddress: "0x460b414B401c5560a59784b7e71850890C28B213",
+        amountEth: "0.0002",
     })
-
-
 
   // TODO: not sure if have to support local env in git!
   // expect(await getDeployment("local")).toEqual({

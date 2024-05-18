@@ -1,12 +1,13 @@
 import * as nearAPI from 'near-api-js';
-import BN from 'bn.js';
+import {sendNearTransaction} from "./utils";
 
-export async function sign(payload, path, nearAccount, contractId) {
+export async function sign(payload, path, nearAccount, contractId, derivedAddress) {
   const args = {
     payload,
     path,
     key_version: 0,
     rlp_payload: undefined,
+    derivedAddress,
   };
   let attachedDeposit = '0';
 
@@ -31,25 +32,13 @@ export async function sign(payload, path, nearAccount, contractId) {
   try {
     console.log('nearAccount.callMethod', nearAccount.callMethod)
     console.log('nearAccount.functionCall', nearAccount.functionCall)
-    if (nearAccount.functionCall != undefined) {
-      console.log('[sign] Sign from near account...')
-      res = await nearAccount.functionCall({
-        contractId,
-        methodName: 'sign',
-        args,
-        gas: new BN('300000000000000'),
-        // attachedDeposit,
-      });
-    } else {
-      console.log('[sign] Sign from custom wallet account...')
-      res = await nearAccount.callMethod({
+    res = await sendNearTransaction({
+        nearSigner: nearAccount,
         contractId,
         method: 'sign',
         args,
-        gas: new BN('300000000000000'),
-        // deposit: attachedDeposit,
-      });
-    }
+        attachedDeposit,
+    });
 
   } catch (e) {
     return console.log('error signing', JSON.stringify(e));
