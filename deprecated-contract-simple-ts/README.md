@@ -1,4 +1,4 @@
-# Cross-Contract Hello Contract
+# Deprecated - Cross-Contract Hello Contract
 
 The smart contract implements the simplest form of cross-contract calls: it calls the [Hello NEAR example](https://docs.near.org/tutorials/examples/hello-near) to get and set a greeting.
 

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint  --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@ethereumjs/common": "^4.3.0",
@@ -17,18 +19,26 @@
     "@near-wallet-selector/here-wallet": "^8.9.5",
     "@near-wallet-selector/modal-ui": "^8.9.5",
     "@near-wallet-selector/my-near-wallet": "^8.9.5",
+    "@types/node": "^20.11.29",
     "axios": "^1.6.8",
     "bitcoinjs-lib": "^6.1.5",
+    "bn.js": "^5.2.1",
     "bs58check": "^3.0.1",
-    "ethers": "^6.11.1",
+    "coininfo": "^5.2.1",
+    "commander": "^12.0.0",
+    "elliptic": "^6.5.5",
+    "ethers": "^5.7.2",
     "hash.js": "^1.1.7",
     "keccak": "^3.0.4",
     "near-api-js": "^3.0.4",
+    "prompts": "^2.4.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "typescript": "^5.4.2",
     "vite-plugin-node-polyfills": "^0.21.0",
-    "web3": "^4.6.0"
+    "web3": "^4.6.0",
+    "xrpl": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
@@ -38,6 +48,7 @@
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "vite": "^5.1.6"
+    "vite": "^5.1.6",
+    "vitest": "^1.6.0"
   }
 }
