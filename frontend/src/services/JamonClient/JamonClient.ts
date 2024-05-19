@@ -22,19 +22,19 @@ export class JamonSwapClient {
     // Generate Derived Address in the Ethereum Network
     // It is aka Offer Id.
     // TODO: add ethereum desired address as salt.
-    async getDerivedEthAddress(mpcPath) {
+    async getDerivedEthAddress(offerId) {
         const {address} = await generateAddress({
             publicKey: MPC_PUBLIC_KEY,
             accountId: NEAR_PROXY_ACCOUNT_ID,
-            path: mpcPath,
+            path: offerId,
             chain: "ethereum",
           });
         return address;
     }
 
     // Create Offer on Near chain: exchange N Eth on Eth chain on M Near on Near chain.
-    async createOffer({offerSalt, expectedAmount}) {
-        const derivedAddress = await this.getDerivedEthAddress(offerSalt);
+    async createOffer({offerId, expectedAmount}) {
+        const derivedAddress = await this.getDerivedEthAddress(offerId);
         const res = await sendNearTransaction({
             nearSigner: this.account,
             contractId: NEAR_PROXY_ACCOUNT_ID,
@@ -61,8 +61,8 @@ export class JamonSwapClient {
     }
 
     // Seller withdraw his Near after Buyer accepted the Offer.
-    async withdrawBySeller({offerSalt}) {
-        const derivedAddress = await this.getDerivedEthAddress(offerSalt);
+    async withdrawBySeller({offerId}) {
+        const derivedAddress = await this.getDerivedEthAddress(offerId);
         const res = await sendNearTransaction({
             nearSigner: this.account,
             contractId: NEAR_PROXY_ACCOUNT_ID,
@@ -79,8 +79,8 @@ export class JamonSwapClient {
     //  Thus, he is ready to accept the Offer:
     // Deposit Near on Near chain, and receive Eth from derived account for his address on Ethereum chain.
     // It is supposed that the buyer knew balance to transfer. TODO: relocate this logic inside.
-    async acceptOffer({offerSalt, buyerEthAddress, amountEth}) {
-        const derivedAddress = await this.getDerivedEthAddress(offerSalt);
+    async acceptOffer({offerId, buyerEthAddress, amountEth}) {
+        const derivedAddress = await this.getDerivedEthAddress(offerId);
 
         // TODO: calculate amount to simplify the flow...
 
@@ -89,7 +89,7 @@ export class JamonSwapClient {
             from: derivedAddress,
             to: buyerEthAddress,
             amount: amountEth,
-            mpcPath: offerSalt,
+            mpcPath: offerId,
             nearAccount: this.account,
             nearContractId: NEAR_PROXY_ACCOUNT_ID,
             derivedAddress,

@@ -41,7 +41,7 @@ test("#jamonSwapClient", async () => {
 
     await client.createOffer(
         {
-            offerSalt: offerId,
+            offerId,
             expectedAmount: 1,
         }
     )
@@ -50,12 +50,12 @@ test("#jamonSwapClient", async () => {
 
     await client.acceptOffer(
     {
-        offerSalt: offerId,
+        offerId,
         buyerEthAddress: "0x460b414B401c5560a59784b7e71850890C28B213",
         amountEth: "0.0002",
     })
 
     await client.withdrawBySeller(
-        {offerSalt: offerId}
+        {offerId}
     )
 }, INTEGRATION_TEST_TIMEOUT);
