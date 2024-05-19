@@ -13,8 +13,12 @@ console.log(MPC_PUBLIC_KEY)
 export class JamonSwapClient {
     // Kinda engine for Near chain transaction {custom wallet, near account}.
     private account: any;
-    constructor(wallet) {
+    constructor(wallet, offerId?) {
         this.account = wallet;
+    }
+
+    generateOfferId(currentUserAddress) {
+        return `offerId${currentUserAddress}.${Date.now()}`;
     }
 
     // Generate Derived Address in the Ethereum Network
