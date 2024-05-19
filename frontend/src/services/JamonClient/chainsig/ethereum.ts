@@ -5,7 +5,12 @@ import { fetchJson } from './utils';
 // import prompts from 'prompts';
 import { sign } from './near';
 
-export class InsufficientFundsOnTargetChainError extends Error {}
+export class InsufficientFundsOnTargetChainError extends Error {
+  constructor(derivedAddress = "", ...args) {
+    super(derivedAddress, ...args);
+    this.message = `Insufficient funds on target chain for address: ${derivedAddress}`;
+  }
+}
 
 const ethereum = {
   name: 'Sepolia',
@@ -70,7 +75,7 @@ const ethereum = {
         ),
       )
     ) {
-      throw new InsufficientFundsOnTargetChainError();
+      throw new InsufficientFundsOnTargetChainError(derivedAddress);
     }
 
     console.log('sending', amount, currency, 'from', address, 'to', to);
