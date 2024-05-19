@@ -32,10 +32,12 @@ export const account = new Account(near.connection, accountId);
 
 
 test("#jamonSwapClient", async () => {
-    const offerId = "random.foo.testnet"
     const client = new JamonSwapClient(
         account,
     )
+    const offerId = "offerIdnear-phd-again.testnet.1716120580598"//client.generateOfferId(NEAR_ACCOUNT_ID)
+    console.log('Generate offerId', offerId)
+
     const derivedAddress = await client.getDerivedEthAddress(offerId)
     console.log('Got Derived address: ', derivedAddress)
 
