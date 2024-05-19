@@ -40,5 +40,15 @@ export async function sendNearTransaction({nearSigner, contractId, method, args,
             deposit: attachedDeposit,
         });
     }
-    return res
+    return nearTransactionParseResponse(res)
+}
+
+function nearTransactionParseResponse(res) {
+    if ('SuccessValue' in (res.status as any)) {
+        console.log(JSON.stringify(`Transaction succeeded, logs: ${JSON.stringify(res)}`))
+        return res
+    } else {
+        console.log('Transaction failed with Error', JSON.stringify(res));
+        return res
+    }
 }

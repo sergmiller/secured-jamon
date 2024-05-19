@@ -5,7 +5,7 @@ import { fetchJson } from './utils';
 // import prompts from 'prompts';
 import { sign } from './near';
 
-export class InsufficientFundsOnTargetChain extends Error {}
+export class InsufficientFundsOnTargetChainError extends Error {}
 
 const ethereum = {
   name: 'Sepolia',
@@ -70,7 +70,7 @@ const ethereum = {
         ),
       )
     ) {
-      throw new InsufficientFundsOnTargetChain();
+      throw new InsufficientFundsOnTargetChainError();
     }
 
     console.log('sending', amount, currency, 'from', address, 'to', to);
