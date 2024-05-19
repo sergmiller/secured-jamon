@@ -1,13 +1,11 @@
-// TODO
 import {generateAddress} from "./chainsig/kdf";
 import ethereum from "./chainsig/ethereum";
 import {sendNearTransaction} from "./chainsig/utils";
 
+// Needed to generate derived account.
 const MPC_CONTRACT_ID = import.meta.env.VITE_MPC_CONTRACT_ID ?? "";
 const MPC_PUBLIC_KEY = import.meta.env.VITE_MPC_PUBLIC_KEY ?? "";
-
-const NEAR_ACCOUNT_ID = import.meta.env.VITE_NEAR_ACCOUNT_ID ?? "";
-
+// Our Target Contract.
 const NEAR_PROXY_ACCOUNT_ID = import.meta.env.VITE_NEAR_PROXY_ACCOUNT_ID ?? "";
 // TODO: assert on all envs.
 console.log(MPC_PUBLIC_KEY)
@@ -49,10 +47,13 @@ export class JamonSwapClient {
     }
 
     // Deposit Eth on Eth chain for the Offer.
-    async depositOfferEth() {}
+    // TODO.
+    async depositBySellerOnTargetChain() {}
 
-    // Check if Seller deposited Eth on Eth chain for the Offer.
-    async checkDepositEth() {}
+    // Check if Seller deposited Eth on Eth chain for the Offer. Buyer checks it himself.
+    async getDepositOnTargetChain(offerId) {
+        return await ethereum.getBalance(await this.getDerivedEthAddress(offerId));
+    }
 
     // Buyer Withdraw his Eth via MPC contract.
     // TODO: separate logic from acceptOffer.
