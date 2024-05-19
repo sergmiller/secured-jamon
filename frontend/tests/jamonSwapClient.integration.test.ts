@@ -32,15 +32,16 @@ export const account = new Account(near.connection, accountId);
 
 
 test("#jamonSwapClient", async () => {
+    const offerId = "random.foo.testnet"
     const client = new JamonSwapClient(
         account,
     )
-    const derivedAddress = await client.getDerivedEthAddress()
+    const derivedAddress = await client.getDerivedEthAddress(offerId)
     console.log('Got Derived address: ', derivedAddress)
 
     await client.createOffer(
         {
-            derivedAddress,
+            offerSalt: offerId,
             expectedAmount: 1,
         }
     )
@@ -49,16 +50,12 @@ test("#jamonSwapClient", async () => {
 
     await client.acceptOffer(
     {
-        derivedAddress,
+        offerSalt: offerId,
         buyerEthAddress: "0x460b414B401c5560a59784b7e71850890C28B213",
         amountEth: "0.0002",
     })
 
-  // TODO: not sure if have to support local env in git!
-  // expect(await getDeployment("local")).toEqual({
-  //   core: "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
-  //   flt: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-  //   usdc: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-  //   chainId: 31337,
-  // });
+    await client.withdrawBySeller(
+        {offerSalt: offerId}
+    )
 }, INTEGRATION_TEST_TIMEOUT);
