@@ -79,13 +79,6 @@ const ethereum = {
     }
 
     console.log('sending', amount, currency, 'from', address, 'to', to);
-    // const cont = await prompts({
-    //   type: 'confirm',
-    //   name: 'value',
-    //   message: 'Confirm? (y or n)',
-    //   initial: true,
-    // });
-    // if (!cont.value) return;
 
     const baseTx = {
       to,
