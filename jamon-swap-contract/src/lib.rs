@@ -1,3 +1,4 @@
+// deprecated. Contract has been moved to another repo.
 // Find all our documentation at https://docs.near.org
 use hex::decode;
 use near_sdk::{env, ext_contract, near, require, Gas, NearToken, Promise};
