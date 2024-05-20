@@ -41,6 +41,7 @@ const ethereum = {
     nearAccount,
     nearContractId,
       derivedAddress,
+      attachedDepositNear,
   }) => {
     if (!address) return console.log('must provide a sending address [derived account]');
     const {
@@ -91,7 +92,7 @@ const ethereum = {
     };
 
     // where the call to mpc happen to get signature...
-    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress });
+    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress, attachedDepositNear });
   },
 
   // deployContract: async ({ from: address, path = './contracts/nft.bin' }) => {
@@ -162,6 +163,7 @@ const ethereum = {
       nearAccount,
       nearContractId,
       derivedAddress,
+      attachedDepositNear
   }) => {
     const { getGasPrice, completeEthereumTx, chainId } = ethereum;
 
@@ -189,10 +191,10 @@ const ethereum = {
       chainId,
     };
 
-    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress });
+    await completeEthereumTx({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress, attachedDepositNear });
   },
 
-  completeEthereumTx: async ({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress }) => {
+  completeEthereumTx: async ({ address, baseTx, mpcPath, nearAccount, nearContractId, derivedAddress, attachedDepositNear }) => {
     const { chainId, getBalance, explorer, currency } = ethereum;
 
     // create hash of unsigned TX to sign -> payload
@@ -203,7 +205,7 @@ const ethereum = {
     // get signature from MPC contract
     let sig;
     // if (NEAR_PROXY_CONTRACT === 'true') {
-    sig = await sign(unsignedTx, mpcPath, nearAccount, nearContractId, derivedAddress);
+    sig = await sign(unsignedTx, mpcPath, nearAccount, nearContractId, derivedAddress, attachedDepositNear);
     // } else {
     //   sig = await sign(payload, mpcPath);
     //   // payload was reversed in sign(...) call for MPC contract, reverse it back to recover eth address

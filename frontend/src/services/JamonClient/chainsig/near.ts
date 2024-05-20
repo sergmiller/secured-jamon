@@ -1,7 +1,7 @@
 import * as nearAPI from 'near-api-js';
 import {sendNearTransaction} from "./utils";
 
-export async function sign(payload, path, nearAccount, contractId, derivedAddress) {
+export async function sign(payload, path, nearAccount, contractId, derivedAddress, attachedDepositNear) {
   const args = {
     payload,
     path,
@@ -9,12 +9,11 @@ export async function sign(payload, path, nearAccount, contractId, derivedAddres
     rlp_payload: undefined,
     derivedAddress,
   };
-  let attachedDeposit = '0';
 
   // if (process.env.NEAR_PROXY_CONTRACT === 'true') {
   delete args.payload;
   args.rlp_payload = payload.substring(2);
-  attachedDeposit = nearAPI.utils.format.parseNearAmount('1');
+  const attachedDeposit = nearAPI.utils.format.parseNearAmount(attachedDepositNear);
   // } else {
   //   // reverse payload required by MPC contract
   //   payload.reverse();
