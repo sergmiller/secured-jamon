@@ -22,6 +22,8 @@ export function BuyerView({ props: { setStatus, wallet, JAMON_SWAP_CONTRACT_ID }
   const [derivedAddress, setDerivedAddress] = useState("")
   const [derivedAddressBalance, setDerivedAddressBalance] = useState("")
   const [addressTo, setAddressTo] = useState("")
+  const [amountToDepositForOfferAccept, setAmountToDepositForOfferAccept] = useState("")
+
 
 
   const [derivation, setDerivation] = useState("cross-contract-jamon5.testnet");
@@ -97,9 +99,12 @@ export function BuyerView({ props: { setStatus, wallet, JAMON_SWAP_CONTRACT_ID }
     console.log(`[handleAcceptOffer] offerId: ${offerId}, addressTo: ${addressTo}, amount: ${amount}...`)
     setStatus(`Call ${JAMON_SWAP_CONTRACT_ID} contract & transfer Eth...`)
     const client = new JamonSwapClient(wallet);
+    if (amountToDepositForOfferAccept == "" || amount == "" || addressTo == "") {
+        throw new Error('Validation error: amountToDepositForOfferAccept, amount, addressTo are required')
+    }
     try{
       const request = await client.acceptOffer({
-            offerId: offerId, buyerEthAddress: addressTo, amountEth: amount,
+            offerId: offerId, buyerEthAddress: addressTo, amountEth: amount, amountDepositNear: amountToDepositForOfferAccept,
         })
       setStatus(`✅ Successful: TODO: transaction hash.`);
     } catch (e) {
@@ -153,18 +158,28 @@ export function BuyerView({ props: { setStatus, wallet, JAMON_SWAP_CONTRACT_ID }
           </div>
 
           <div className="row mb-3">
-              <label className="col-sm-3 col-form-label col-form-label-sm">AddressTo:</label>
+              <label className="col-sm-3 col-form-label col-form-label-sm">Address To Receive:</label>
               <div className="col-sm-9">
                   <input type="text" className="form-control form-control-sm" value={addressTo} disabled={loading}
                          onChange={(e) => setAddressTo(e.target.value)}/>
                   <div className="form-text" id="eth-sender"> Specify address to receive the Eth (Sepolia).
                   </div>
               </div>
-              <label className="col-sm-3 col-form-label col-form-label-sm">Amount:</label>
+              <label className="col-sm-3 col-form-label col-form-label-sm">Amount To Receive:</label>
               <div className="col-sm-9">
                   <input type="text" className="form-control form-control-sm" value={amount} disabled={loading}
                          onChange={(e) => setAmount(e.target.value)}/>
-                  <div className="form-text" id="eth-sender"> Specify amount to transfer to you (remember that transaction requires gas).
+                  <div className="form-text" id="eth-sender"> Specify amount to transfer to you (remember that
+                      transaction requires gas).
+                  </div>
+              </div>
+              <label className="col-sm-3 col-form-label col-form-label-sm">Amount To Send:</label>
+              <div className="col-sm-9">
+                  <input type="text" className="form-control form-control-sm" value={amountToDepositForOfferAccept}
+                         disabled={loading}
+                         onChange={(e) => setAmountToDepositForOfferAccept(e.target.value)}/>
+                  <div className="form-text" id="eth-sender"> Specify amount to deposit (Near) (TODO: get from
+                      contract).
                   </div>
               </div>
           </div>
