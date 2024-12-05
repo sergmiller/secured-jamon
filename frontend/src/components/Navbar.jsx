@@ -1,4 +1,4 @@
-import logo from "../assets/apple-touch-icon.png";
+import logo from "../assets/logo-white.svg";
 import PropTypes from 'prop-types';
 import { Wallet } from "../services/near-wallet.js";
 

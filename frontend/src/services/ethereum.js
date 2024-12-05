@@ -80,7 +80,7 @@ export class Ethereum {
   }
 
   async prepareSignatureForEth(
-      transactionHash,
+      transactionHash, // the problem with contract -> mpc contract
       wallet,
       transaction,
       senderAddress,
@@ -117,7 +117,9 @@ export class Ethereum {
     const payloadData = {data: payload}
     console.log(`[requestSignatureToMPC] payloadData: ${JSON.stringify(payloadData)}, type: ${typeof payload}`)
     console.log(`[requestSignatureToMPC] path: ${path}`)
-    const request = await wallet.callMethod({ contractId, method: 'sign', args: { payload, path, key_version: 0 }, gas: '250000000000000' });
+    const request = await wallet.callMethod(
+        { contractId, method: 'sign', args: { payload, path, key_version: 0 }, gas: '250000000000000' }
+    );
     return await this.prepareSignatureForEth(
       request.transaction.hash,
       wallet,
